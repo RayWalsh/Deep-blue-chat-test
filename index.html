@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deep Blue Chat</title>
+  <style>
+    body { font-family: Arial; background: #f0f4f8; padding: 20px; }
+    #chat { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    .message { margin-bottom: 15px; }
+    .user { font-weight: bold; color: #003366; }
+    .bot { color: #333; }
+    input, button { padding: 10px; font-size: 16px; margin-top: 10px; width: 100%; }
+  </style>
+</head>
+<body>
+
+<div id="chat">
+  <h2>Deep Blue Shipping Assistant</h2>
+  <div id="messages"></div>
+  <input type="text" id="userInput" placeholder="Type your question..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+const endpoint = "https://ai-testhub947379833253.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-05-01-preview";
+const apiKey = "FFTykd1ZqJd9xdxHxZMImykJB8Ga1W4NCzqljBh5IzJpZHfYVVFlJQQJ99BDACmepeSXJ3w3AAAAACOGPZom";
+
+  async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const msg = input.value;
+    if (!msg) return;
+
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML += `<div class="message user">You: ${msg}</div>`;
+    input.value = "";
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: "You are a helpful assistant for Deep Blue Shipping." },
+          { role: "user", content: msg }
+        ],
+        temperature: 0.7
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
+    messagesDiv.innerHTML += `<div class="message bot">Bot: ${reply}</div>`;
+  }
+</script>
+
+</body>
+</html>
